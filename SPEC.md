@@ -1,18 +1,8 @@
 # UltronKit: UNIVERSAL RUNTIME SPECIFICATION (MISSION-CRITICAL)
 
-> [!IMPORTANT]
-> **CONTEXT ANCHOR:**
->
-> 1.  **Zero Toolchain:** 빌드 도구 없이 브라우저 단독 구동. (npx serve 만 가능)
-> 2.  **Audit Barrier:** 모든 코드는 `verify` 알고리즘에 따른 선택 티어(Tier 1: 30줄/80자/CX:10, Tier 3: 10줄/70자/CX:2)의 규칙을 1비트의 오차 없이 통과해야 함.
-> 3.  **Conceptual Separation:** 변수/제어문/반환 블록 간 정확히 1줄 빈 줄 필수. 중괄호 Zero Padding 엄수.
-> 4.  **Mutual Assurance:** 장부(Registry)와 실체(Code)의 1:1 일치 보증. (Ghost/Shadow 감지)
-> 5.  **Law over King:** 코딩 전 반드시 이 명세서를 먼저 읽고 집행할 것.
-> 6.  **Comment Ban:** 헤더 주석 외 모든 주석(내부 설명, 좀비 코드 등)은 즉시 패닉 사유.
-
 **Version:** 0.0.0 (Space-Grade Alpha)
 **Target:** Mission-Critical Browser Applications (Chromium-based Runtime)
-**Inspired By:** NASA Power of 10, MISRA C:2012, SEI CERT, CWE/SANS Top 25, WCAG 2.1, NASA cFS, AUTOSAR, DO-178C
+**Inspired By:** NASA Power of 10, MISRA C:2012, SEI CERT, CWE/SANS Top 25, WCAG 2.1, NASA cFS, AUTOSAR, DO-178C, FACE, ARINC 661, DO-178C/ED-12C, WPE/Embedded, ISO 26262, ISO/SAE 21434, IEC 62304
 
 > **Disclaimer:** This specification adopts principles from aerospace/safety-critical standards for browser-based JavaScript. It is not formally certified to these standards. Target benchmark: SpaceX Crew Dragon GUI (Chromium + JS).
 
@@ -23,10 +13,51 @@
 ### 1.1. The SpaceX Directive: Beyond Crew Dragon
 
 **벤치마크 (Benchmark):**
-SpaceX의 Crew Dragon 인터페이스는 **Chromium 브라우저 + JavaScript** 기반으로 구축되어, 유인 우주 비행 미션을 성공적으로 수행함으로써 웹 기술의 신뢰성을 입증했다. (Verified: No Framework, No Web Components explicit claim).
+SpaceX의 Crew Dragon 인터페이스는 **Chromium 브라우저 + JavaScript** 기반으로 구축되어, 유인 우주 비행 미션을 성공적으로 수행함으로써 웹 기술의 신뢰성을 입증했다. 단, JS/Chromium 컴포넌트는 **DO-178C 인증을 받지 않았으며**, UI는 모니터링/체크리스트 용도로만 사용된다. 안전-크리티컬 기능은 C/C++로 별도 구현되어 있고, 디스플레이 경계 밖에서 독립적인 fault tolerance 메커니즘이 존재한다. 그럼에도 **그것조차 우주에 나갔다**는 사실은 웹 기술의 가능성을 보여준다.
+
+**추가 벤치마크:**
+
+- **자동차 IVI (In-Vehicle Infotainment):** HTML5 + JavaScript 사용 증가. ISO 26262 (Functional Safety), ISO/SAE 21434 (Cybersecurity) 참고.
+- **항공 IFE (In-Flight Entertainment):** WebView 기반 시스템. ARINC 661 참고.
+- **의료기기 디스플레이:** 웹 기반 UI. IEC 62304 참고.
 
 **우리의 목표 (UltronKit Objective):**
 UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극복해야 할 기준선(Min-Spec)'**으로 삼는다. 우리는 범용 브라우저 런타임 위에서 동작하지만, 단순 가이드라인을 넘어 감사 장벽(Audit Barrier) 통과 실패 시 시스템의 존재 자체를 거부하는 **출검 봉쇄(Clearance Block)** 메커니즘을 통해 그보다 더 높은 수준의 소프트웨어 무결성과 생존성을 달성한다.
+
+**한계와 최대치 (Limits & Maximum):**
+JavaScript와 브라우저/Node.js 런타임은 진정한 미션크리티컬(사람의 목숨이 달린) 환경에 어울리는 기술이 아니다. JS용 안전 표준은 존재하지 않으며, 런타임 자체의 신뢰성도 보장되지 않는다. 그러나 UltronKit은 **해당 런타임에서 가능한 최대치**를 목표로 하며, 강력한 규칙을 **최대한 포함**하여 거의 표준 준수 급에 가깝게 만든다. 또한 파일 사이즈, 개발자 경험(DX), 성능에서도 문제가 없어야 한다. 궁극적 목표는 **문제 발생 시 구현코드가 아닌 런타임 문제라고 확답할 수 있는 수준**을 달성하는 것이다.
+
+**UltronKit 프로젝트 일환:**
+ultronkit-js는 UltronKit 전체 프로젝트의 **JavaScript 버전**이다. 본 명세는 JS 버전에 집중하되, Go, Kotlin, Python, C++, C 버전도 계획 중이다. 이는 JS 코드를 포팅하는 것이 아니라, **각 언어/플랫폼의 특성에 맞는 독자적 구현**이다. 전체 UltronKit 프로젝트는 https://ultronkit.web.app/ 및 https://github.com/ultronkit 을 참고하라.
+
+**AI-First 설계 (Agentic Era):**
+UltronKit은 **세계 최초의 AI-First 엔지니어링 표준**이다. 인간의 편의성을 위해 설계된 것이 아니라, **AI 에이전트의 피드백 루프**를 위해 설계되었다. Tier 3 규칙은 인간에게 고통스럽지만, AI에게는 감정이 없어 상관없다. 에러가 0이 될 때까지 무한 반복 가능하며, 토큰 비용만 유의미하게 낮다면 안 쓸 이유가 없다. 이것은 **인간을 위한 것이 아니다**.
+
+**AI vibe coding 한계 해결:**
+현재 AI는 시작은 잘하지만 완성도 유지와 품질 일관성에 실패한다. UltronKit은 이 한계를 해결한다. 모든 미션크리티컬 표준의 규칙을 LLM 컨텍스트에 주입하는 것은 불가능하고, skills.md, MCP, "React 베스트프랙티스" 같은 프롬프트 주입은 **해결책이 아니다**. LLM은 그런 것들을 무시하고 혼자 커밋/푸쉬해버린다.
+
+**Zero Prompt:**
+필요한 프롬프트는 오직 **"에러를 0개로 만들어라"** 뿐이다. 패닉이 터지면 고치면 된다. skills.md, MCP, 베스트프랙티스 문서 같은 것들은 필요 없다. 코드 자체가 규칙이고, 규칙을 어기면 PANIC이다.
+
+**Self-Documenting:**
+코드 자체가 규칙이다. 별도 API 문서, 설명서, 프롬프트가 필요 없다. LLM은 단일 파일인 코드 전체를 읽으면 되고, 중요한 내용은 헤더 주석으로 삽입 가능하다 (내부 주석은 Tier 3에서 금지).
+
+**Anti-Cheating:**
+LLM은 기상천외한 방법으로 일을 안 하려 하고 치팅을 시도한다 (주석처리, 도구 호출 안 함, 검증 코드 무력화 시도 등). CDN 사용 시 검증 코드 변조가 불가능하므로 대부분의 치팅을 방지할 수 있다. 로컬 사용 시에는 diff로 확인 필요. 치팅 시 즉시 감지 가능하다.
+
+**유지보수 비용 최소화:**
+오늘 되고 내일 깨지는 시스템의 유지보수 비용과 기술 부채가 가장 비싸다. UltronKit의 목표는 **첫 배포에서 해결**하고, 요구사항 변경 시에만 터치하는 것이다. AI + UltronKit으로 혼자 수천 개 프로젝트 운영 가능.
+
+**도구와 비슷한 효과 (완전한 대체 아님):**
+UltronKit은 SQLite 수준의 고도화된 테스트(퍼징 등)를 **대체하지 않는다**. 그러나 다음과 같은 효과를 제공한다:
+
+- **린터/포매터**: 감사 규칙이 린터 역할, AI가 규칙에 맞춰 수정
+- **정적분석기**: `Verify.audit()`이 부팅 시 정적분석 수행
+- **테스트도구**: Ghost/Shadow 감지 = 대충 짠 유닛테스트 커버리지 100%와 비슷한 효과 (테스트코드 0줄). 동작 체크가 아닌 **구조 변화 감지**. AI가 멋대로 없애는 것 방지 + 뭘 지웠는지 스스로 앎
+- **컴파일타임 체크**: JS는 컴파일타임이 없지만, **런타임 부팅 시 컴파일타임처럼 검증**. CI/CD 커밋 후 몇 분 대기 vs 부팅 시 100ms
+
+**티어 작업 흐름:**
+Tier 1 → 2 → 3 점진적 상승. 리팩토링 필요 시 Tier 2 또는 1로 하강 후 다시 상승. 처음부터 Tier 3은 불가능 (에러 수천 개 동시 발생). Tier 1만으로도 **대부분의 프로덕션에서 안 하는 것**(린팅, 포매팅, 정적분석 등)을 **기본으로 강제**한다.
 
 ---
 
@@ -42,7 +73,29 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 6.  **Absolute Boundary Enforcement (Isolation):** "경계는 물리적이다." 계층 간 접근 제한이 언어적/물리적으로 강제되는가?
 7.  **Finality (최종성):** 부팅 후 제로 할당(Zero-Allocation) 및 비분기 선형 로직을 통해 '상수의 세계'를 지향하는가?
 
-### 1.3. Boundary Enforcement: 계층 격리 강제 수단
+### 1.3. Recursive Document Supremacy (재귀적 문서 우위)
+
+본 명세서의 구조는 그 자체로 엄격한 **단방향 의존성(One-way Dependency)**을 가지며, 시스템 부팅 시점에 물리적 강제력을 가진다.
+
+| 위계 (Hierarchy)        | 권한 (Authority)                                                | 물리적 집행력               |
+| :---------------------- | :-------------------------------------------------------------- | :-------------------------- |
+| **Section N**           | **Section N+1의 헌법(Constitution).** 절대적 상위 규범.         | 수정 시 하위 즉시 무효      |
+| **Section N+1**         | **Section N의 종속물(Dependent).** 상위 규범 위반 시 무효.      | 상위 규격 위반 시 부팅 차단 |
+| **Code Implementation** | **Document의 그림자 (Shadow).** 명세서와 1비트라도 다르면 배신. | 불일치 시 런타임 진입 봉쇄  |
+
+**[판결 및 집행 원칙 (Adjudication & Enforcement)]**
+
+1.  **Waterfall Authority:** 상위 섹션(N)이 확정되기 전에는 하위 섹션(N+1)을 작성하거나 수정할 수 없다.
+2.  **Cascade Update:** 상위 섹션(N)이 수정되면, 그 아래 모든 하위 섹션(N+1 ~ End)은 즉시 **폐기(Invalidated)** 상태가 되며 재검토해야 한다.
+3.  **Conflict Resolution:** 상위 섹션과 하위 섹션의 내용이 충돌할 경우, 무조건 **상위 섹션(N)이 진실(Truth)**이다.
+4.  **Formatting Rule:** 헤더 깊이는 기본 2단계(n.n)로 제한한다. 단, **섹션 1(헌법)에 한해** 3단계(n.n.n)를 허용한다. 4단계 이상은 물리적으로 불가능하다. 각 단계에서 하위 항목은 10개를 초과할 수 없다. **섹션 번호 N은 반드시 1 이상 10 이하의 정수여야 한다.** (0 또는 11 이상의 섹션은 물리적으로 존재가 불가능하다.)
+5.  **Downward Reference Prohibition (하향 참조 금지):** 상위 섹션(N)은 하위 섹션(N+1 이하)을 **절대 참조하지 않는다**. 하위 섹션이 상위 섹션을 참조하며 확장하는 것만 허용된다. 상위가 하위를 참조하면 하위 변경 시 상위가 깨지므로, 이 원칙을 통해 문서의 안정성을 유지한다.
+6.  **Horizontal Independence (수평적 독립):** 동일 섹션 내 하위 항목들은 서로 참조할 수도, 독립적으로 병존할 수도 있다. 상호 참조 시 동일 레벨로 간주하며, 의존성 강제는 상위→하위 방향에만 적용된다.
+7.  **Naming Flexibility (명칭의 유연성):** 본 문서의 명칭들은 역할과 원칙을 설명하기 위한 일반 명사이다. 명칭은 **논쟁의 여지가 없고 다양한 해석의 여지가 없는** 것을 우선한다. 창의력을 발휘하여 새 이름을 지어내지 않으며, **일반적으로 통용되는 기존 명칭**이 있다면 그것을 선택한다. 구현 시 해당 언어나 시스템의 특성을 더 잘 반영하는 명사가 있다면 이를 사용할 수 있으며, 명세서의 이름을 코드에 그대로 강제하지 않는다. 범용적으로 더 나은 명칭이 발견되면 명세서도 함께 수정한다. 문서 분석/검증 및 작성/수정 시에도 이 원칙을 적용한다.
+
+---
+
+### 1.4. Boundary Enforcement: 계층 격리 강제 수단
 
 계층과 모듈 간의 격리는 신사협정이 아닌 **물리적/논리적 장벽(Blockade)**으로 구현되며, 다음 수단들을 동시 적용하여 강제한다.
 
@@ -59,9 +112,9 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 > [!CAUTION]
 > 위 수단 중 하나라도 누락되면 계층 경계가 무력화될 수 있다. 모든 수단을 **중첩 적용**하는 것이 원칙이다.
 
-**※ 명칭의 유연성:** 본 섹션의 명칭은 격리 원칙과 역할을 설명하기 위한 일반 명사이다. 구현 시 해당 언어나 시스템의 특성을 더 잘 반영하는 더 나은 명사가 있다면 이를 사용할 수 있으며, 명세서의 이름을 코드에 그대로 강제하지 않는다.
+---
 
-### 1.4. Universal Module Axioms & Recursive Integrity (모듈 공리 및 재귀적 무결성)
+### 1.5. Universal Module Axioms & Recursive Integrity (모듈 공리 및 재귀적 무결성)
 
 모듈은 시스템 무결성을 증명하는 최소 원자 단위이며, 명세서와 코드 간의 **1:1 추적성**과 **이중 강제 체계**를 통해 그 실체가 정의된다.
 
@@ -81,7 +134,7 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 - **Internal (비노출 최상구):** 외부에 은닉되어 있으나 모듈의 핵심 미션을 집행하고 원자 함수들을 조율하는 실질적 지휘관 기능군.
 - **Atomic (최소 원자구):** 품질 기준(10줄 이하 등)을 맞추기 위해 쪼개진, 더 이상 논리적으로 분할 불가능한 실제 연산 단위군. 상위 공용 장부로 승격될 수 있는 대상이다.
 
-**[Registry: 기저 법전의 물리적 우위]**
+#### 1.5.1. Registry Statute (장부 법전)
 
 - **물리적 배치:** `Registry`는 **`Layer 1 (Fundamental Base)`**의 정점이자 첫 번째 코드로 위치한다.
 - **인과적 우위:** 시스템 내 모든 존재(`System`, `Layer`, `Module`, `Func)는 선언과 동시에 `Registry`를 통과해야 한다. 이는 단순 로직이 아닌 모든 레이어의 존재를 규정하는 **'물리적 우주 상수'**이자 **'코드 법전'**이다.
@@ -105,11 +158,12 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 - **Layer Spec:** `{ id: LID, modules: Module[] }` (하위 정보를 하드코딩으로 중첩 확장)
 - **System Spec:** `{ id: SYSID, layers: Layer[] }` (전체 위계를 집대성)
 
-> **The Law of Dependency (의존성의 법칙)**
-> 두 모듈 간의 관계가 레이어 배치를 결정한다.
->
-> 1. **Co-location (동거):** 서로를 참조(Cycle)하거나 긴밀히 결합되어 있다면 반드시 같은 계층에 배치한다.
-> 2. **Strict Separation (엄격한 분리):** 참조가 단방향(One-way)이라면 참조 받는 자(Server)를 하위에, 참조 하는 자(Client)를 상위에 배치한다.
+#### 1.5.2. Dependency Law (의존성 법칙)
+
+두 모듈 간의 관계가 레이어 배치를 결정한다.
+
+1. **Co-location (동거):** 서로를 참조(Cycle)하거나 긴밀히 결합되어 있다면 반드시 같은 계층에 배치한다.
+2. **Strict Separation (엄격한 분리):** 참조가 단방향(One-way)이라면 참조 받는 자(Server)를 하위에, 참조 하는 자(Client)를 상위에 배치한다.
 
 이 법칙에 따라 다음의 불변 규약이 강제된다.
 
@@ -127,7 +181,7 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 2. **중개:** 상위 Layer가 둘을 중개한다
 3. **분리:** 의존 방향을 한쪽으로 정리하여 별도 Layer로 분리한다
 
-**[모듈의 원자성 (Atomicity)]**
+#### 1.5.3. Module Atomicity (모듈 원자성)
 
 모듈은 더 이상 쪼개질 수 없는 **최소 논리 단위**이며, 다음 규칙을 통해 그 원자성을 보장한다.
 
@@ -135,7 +189,7 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 2.  **성질의 단일성 (Purity of Nature):** 하나의 모듈은 **구조적 분류학(Architectural Taxonomy)** 중 **오직 한 가지 성질**만을 가져야 한다. (예: 순수 논리와 환경 어댑터가 섞인 모듈은 존재할 수 없다.)
 3.  **책임의 완결성 (Completeness):** 모듈의 경계는 단순히 코드의 양이 아니라, 다루는 데이터와 책임이 독립적으로 완결되는지를 기준으로 정의한다.
 
-**[계층의 발현과 진화 (Evolution)]**
+#### 1.5.4. Layer Evolution (계층 진화)
 
 계층은 고정된 상수가 아니라, 의존성 조사를 통해 **발견(Discovered)**되는 역동적인 구조다.
 
@@ -146,9 +200,35 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 > [!IMPORTANT]
 > 런타임(TDZ)이 잡지 못하는 위반은 `Verify.audit()`에서 **부팅 시점에 반드시 감지**해야 한다.
 
+#### 1.5.5. Source Acquisition (소스 획득)
+
+감사 엔진(`Verify.audit`)이 코드를 분석하려면 소스 텍스트를 런타임에 획득해야 한다. 빌드 도구 없이 브라우저에서 동작하므로, 다음 메커니즘을 사용한다.
+
+> [!IMPORTANT]
+> **소스 획득 원칙:** 모든 분석 대상 파일은 **1라인부터 마지막 라인까지 전체를 정확히 읽어야** 한다. 부분 읽기나 DOM에서의 추출이 아닌, **파일 자체를 획득**하는 것이 원칙이다.
+
+> [!CAUTION]
+> **검사 대상 제한:** 광고 코드, Google Analytics, CDN 종속성 등 **cross-origin 외부 스크립트는 검사 대상이 아니다**. 종속성을 사용하지 않으면 품질을 거의 보장하지만, **외부 종속성을 사용하면 해당 부분에 대한 책임은 사용자에게 있다**.
+
+1.  **커널 자체 소스 획득:** `document.currentScript.src`(또는 ES Module의 경우 `import.meta.url`)로 URL을 획득하고 `fetch()`로 파일 전체 텍스트를 가져온다. jsDelivr 등 CORS를 허용하는 CDN에서도 동작한다.
+2.  **커널 자신 식별:** `document.currentScript`로 자신을 식별하고, 구현코드 카운트에서 제외한다. 이를 통해 로컬 테스트(다운로드) 환경에서 ultronkit.js와 app.js가 모두 same-origin일 때도 정상 동작한다.
+3.  **구현코드 소스 획득:** `document.querySelectorAll('script[src]')`로 모든 외부 스크립트를 수집하고, same-origin인 스크립트만 필터링하여 `fetch()`로 소스를 획득한다.
+4.  **단일 파일 강제 (Tier 3):** 커널과 Service Worker를 제외한 same-origin 스크립트가 1개를 초과하면 즉시 `PANIC("SINGLE_FILE_VIOLATION")`을 발생시킨다. 구현코드는 반드시 단일 파일이어야 한다.
+5.  **inline script 처리:** `script:not([src])`로 수집하고 `textContent`로 소스를 획득한다.
+6.  **부팅 타이밍:** 소스 획득은 `DOMContentLoaded` 이후에 수행하여 모든 스크립트가 로드된 상태를 보장한다.
+7.  **HTTP 서버 필수:** `file://` 프로토콜에서는 `fetch()`가 CORS 에러로 실패한다. 로컬 테스트 시 반드시 HTTP 서버(`npx serve`)를 사용해야 한다.
+8.  **Service Worker 허용:** PWA 지원을 위해 Service Worker 파일(0~1개)을 별도 허용한다. `navigator.serviceWorker.getRegistrations()`로 등록된 SW를 조회하고, `registration.active.scriptURL`로 URL을 획득하여 분석 대상에 포함한다. Service Worker는 보안상 Blob URL 등록이 금지되므로 반드시 별도 파일로 존재해야 한다.
+9.  **Web Worker 처리:** Web Worker는 Blob URL로 inline 생성이 가능하므로 별도 파일을 허용하지 않는다. 커널 내부에서만 `URL.createObjectURL(new Blob([...]))`을 사용하여 Worker를 생성한다.
+10. **Worker 풀 정책:** 커널은 부팅 시 **코어 수에 따라 적절한 수의 Worker를 고정 생성**한다. 최소 2개 (감사용 1개 + 별도 처리용 1개)를 보장하며, 코어가 많다면 `코어 수 - 1` 또는 `-2`개를 생성한다. 메인스레드와 독립적으로 동작하며, 특히 Node.js 서버 환경에서는 이 정책이 성능에 결정적이다.
+11. **Blob URL 제한:** `URL.createObjectURL()`은 커널 내부의 Web Worker 생성 용도로만 최소 허용하며, 구현코드에서의 사용은 금지한다. Blacklist에 추가하여 감사 시 위반으로 처리한다.
+12. **HTML 분석:** 현재 로드된 문서의 `document.documentElement.outerHTML`을 획득하여 분석 대상에 포함한다. JS만 검사하면 GUI에서 치명적 구멍이 발생할 수 있으므로, HTML도 감사 대상이다.
+13. **CSS 분석:** `document.querySelectorAll('link[rel="stylesheet"]')`로 외부 CSS 파일을 수집하고, same-origin이며 `.css` 확장자인 파일만 필터링하여 `fetch()`로 소스를 획득한다. CSS 파일은 1개를 초과하면 `PANIC("SINGLE_CSS_VIOLATION")`을 발생시킨다. 파일명은 자유이나 개수와 확장자만 강제한다.
+14. **100ms 목표:** 모든 사용자 기기에서 감사 완료까지 **100ms 이내**를 목표로 한다. CI/CD 파이프라인은 커밋 후 몇 분을 기다려야 결과를 알 수 있지만, UltronKit은 부팅 시점에 즉시 검증한다. 이는 미션크리티컬 시스템이 실행 중에 스스로 검증하는 것과 유사하다.
+15. **Web Worker 비동기 검사:** 무거운 감사 작업은 UI를 블로킹하지 않도록 **UI를 먼저 렌더링**한 후 **Web Worker에서 백그라운드로 수행**한다. 위반 발견 시 즉시 PANIC을 발생시켜 시스템을 정지시킨다.
+
 ---
 
-### 1.5. Inter-Layer Communication: 통신 불변 규약
+### 1.6. Inter-Layer Communication: 통신 불변 규약
 
 > **Principle:** 모든 계층이 접근 가능한 통합 통신 수단(**Channel**)은 반드시 **Universal Layer (기저 계층)**에 정의되어야 한다. 이는 메모리/스레드/네트워크 경계를 추상화한다.
 
@@ -165,18 +245,25 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 
 ---
 
-### 1.6. Post-Web Continuity Strategy (The Invariant Kernel)
+### 1.7. Post-Web Continuity Strategy (The Invariant Kernel)
 
 플랫폼 붕괴 시에도 비즈니스 로직과 데이터의 생명을 유지하기 위한 연속성 전략이다.
 
 1.  **Platform Agnosticism:** 커널 코어는 자신이 브라우저에 있는지 등 외부 환경을 알지 못해야 한다. `window`, `document` 등 전역 객체 접근은 오직 **Platform Adapter** 내부에서만 허용된다.
 2.  **IO-Less Logic:** 모든 비즈니스 로직은 화면이 없는 환경에서도 동일하게 실행 가능해야 한다. UI 상태(스크롤 위치)와 도메인 상태(유저 데이터)를 엄격히 분리한다.
 3.  **Disposable Adapter:** 미래에 브라우저가 사라지면 플랫폼 어댑터와 뷰 레이어만 폐기하고 교체한다.
-4.  **Native Universe:** 본 아키텍처는 C/C++, Go, Kotlin, Python 확장을 목표로 한다. (단, 사상적 결함으로 인해 **Rust는 영구히 배제한다.**)
+4.  **Native Universe (다중 언어 생태계):** UltronKit은 **포팅이 아니라 각 언어/플랫폼의 역할에 맞는 독자적 구현**이다. 서로 완전히 다른 성격을 가진다:
+    - **Go:** 베이스 언어. 데스크탑/서버 로직의 중심.
+    - **JS:** 모든 플랫폼의 **GUI (WebView)**. 뷰 레이어 통일.
+    - **Python:** 데이터사이언스 등 필수적인 경우에만 **최소 사용**, 별도 프로세스로 Go와 통신하여 미션크리티컬함 유지.
+    - **C++/C:** Go에서 도달 불가능한 **극한 성능** 필요시 cgo로 연결, 또는 전체 프로젝트를 직접 작성.
+    - **C:** OS 없는 보드의 **펌웨어용**.
+    - **Kotlin:** 안드로이드 앱의 **쉘(Shell)**. Go는 WASM으로 빌드되어 원격 로직 업데이트 가능.
+    - **(Rust 및 Apple 생태계(iOS/macOS)는 지원 계획 없음.)**
 
 ---
 
-### 1.7. Boundary of Control (Inescapable Runtime Constraints)
+### 1.8. Boundary of Control (Inescapable Runtime Constraints)
 
 우리는 JavaScript 엔진의 내부 동작(GC, JIT, Event Loop 등)을 직접 제어할 수 없음을 인정하며, 이를 시스템이 준수해야 할 '불가항력적 경계'로 정의한다.
 
@@ -184,6 +271,7 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 2.  **Monomorphism (Shape Stability):** 객체 구조는 생성 시점에 모든 프로퍼티를 즉시 확정해야 하며, 이후 임의의 형상(Hidden Class) 변경을 영구히 금지한다. 이는 엔진이 고속 최적화 경로(Inline Cache)를 이탈하지 않게 강제하는 물리적 계약이다.
 3.  **Pointer-based Sequence Control:** 데이터 처리 시 메모리 이동 및 복사를 배제하기 위해 고정 배열(TypedArray)을 사용한다. 모든 선후 관계는 정수 인덱스(Read/Write Pointer)의 순환만으로 정의되며, 이 포인터의 물리적 위치가 실행 인과율의 유일한 권위가 된다.
 4.  **Interface Air-lock:** 런타임 콜백(EventListener, Timer 등) 시점의 지연을 상시 감시한다. 엔진 지연(Drift) 감지 시 유계된 과거 이벤트를 차단(Drain)하고, 시스템 진입점에서 오염된 신호가 커널 내부로 유입되는 것을 물리적으로 막는다.
+5.  **Static Memory + Dynamic Option:** 런타임 제로 할당을 기본으로 제공하며, 공통적으로 쓰이는 상태들은 미리 정적 슬롯에 할당해둔다. 단, 동적 할당이 필요한 경우도 허용하되, **GC 개입을 최소화하는 Pool 패턴** 등의 옵션을 제공한다. 특히 Node.js 서버 환경에서는 이 정책이 필수적이다.
 
 | 통제 불가능 변수       | 대응 전략 (Mitigation Strategy)                                                                                                                                                                            | 책임 영역    |
 | :--------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------- |
@@ -194,32 +282,13 @@ UltronKit은 Crew Dragon의 기술 스택을 단순한 참조가 아닌 **'극�
 
 ---
 
-### 1.8. Operational Policy: Architectural Sovereignty (Immutable Distribution)
+### 1.9. Operational Policy: Architectural Sovereignty (Immutable Distribution)
 
 울트론킷은 **"영원한 안정성(Eternal Stability)"**을 지향하며, 배포 정책은 '대중적 안정성'과 '미션적 진보'라는 두 개의 독립된 주권(Sovereignty)을 가진다.
 
 1.  **Legacy Protection (Tier 1~2):** 일반 프로젝트 및 CDN 사용자를 위해 DX와 하위 호환성을 최우선으로 보호한다. 단, CDN 서비스(Latest Release) 이용 시 발생하는 실시간 규격 변화는 사용자가 전적으로 감수해야 하며, 안정적인 운영 확신이 필요한 경우 반드시 파일을 직접 다운로드하여 고정(Freeze)해야 한다. (**Update or Die 철학 배제**)
 2.  **Mission Evolution (Tier 3):** 미션 크리티컬 영역은 시스템의 공격적인 무결성 강화 혜택을 온전히 수용한다. 이 영역은 하위 호환성보다 물리적 무결성의 극한을 우선하며, **무결성 기준 강화에 따른 상시 브레이킹 체인지를 허용**한다.
-3.  **Download & Freeze (Version Locking):** 시스템의 물리적 생존을 위해, 미션 환경(Tier 3)은 특정 시점의 단일 파일(`ultronkit.js`)을 로컬에 고정하여 사용하는 것을 원칙으로 강제한다. 이는 외부 요인(네트워크, 도구의 사멸)에 관계없이 시스템이 수세기 동안 동일하게 동작함을 보장한다. 일반 프로덕션(Tier 1~2) 사용자 또한 CDN의 편의성보다 안정성을 우선할 경우 이 방식을 자유롭게 선택할 수 있으며, 이 모든 결정은 사용자의 아키텍처 주권에 속한다.
-
----
-
-### 1.9. Recursive Document Supremacy (재귀적 문서 우위)
-
-본 명세서의 구조는 그 자체로 엄격한 **단방향 의존성(One-way Dependency)**을 가지며, 시스템 부팅 시점에 물리적 강제력을 가진다.
-
-| 위계 (Hierarchy)        | 권한 (Authority)                                                | 물리적 집행력               |
-| :---------------------- | :-------------------------------------------------------------- | :-------------------------- |
-| **Section N**           | **Section N+1의 헌법(Constitution).** 절대적 상위 규범.         | 수정 시 하위 즉시 무효      |
-| **Section N+1**         | **Section N의 종속물(Dependent).** 상위 규범 위반 시 무효.      | 상위 규격 위반 시 부팅 차단 |
-| **Code Implementation** | **Document의 그림자 (Shadow).** 명세서와 1비트라도 다르면 배신. | 불일치 시 런타임 진입 봉쇄  |
-
-**[판결 및 집행 원칙 (Adjudication & Enforcement)]**
-
-1.  **Waterfall Authority:** 상위 섹션(N)이 확정되기 전에는 하위 섹션(N+1)을 작성하거나 수정할 수 없다.
-2.  **Cascade Update:** 상위 섹션(N)이 수정되면, 그 아래 모든 하위 섹션(N+1 ~ End)은 즉시 **폐기(Invalidated)** 상태가 되며 재검토해야 한다.
-3.  **Conflict Resolution:** 상위 섹션과 하위 섹션의 내용이 충돌할 경우, 무조건 **상위 섹션(N)이 진실(Truth)**이다.
-4.  **Formatting Rule:** 헤더 깊이는 최대 2단계로 제한하며, 하위 항목은 10개를 초과할 수 없다. **섹션 번호 N은 반드시 1 이상 10 이하의 정수여야 한다.** (0 또는 11 이상의 섹션은 물리적으로 존재가 불가능하다.)
+3.  **Download & Freeze (Version Locking):** 시스템의 물리적 생존을 위해, 미션 환경(Tier 3)은 특정 시점의 단일 파일(`ultronkit.js`)을 로컬에 고정하여 사용하는 것을 원칙으로 강제한다. 이는 외부 요인(네트워크, 도구의 사멸)에 관계없이 시스템이 **플랫폼 수명 동안** 동일하게 동작함을 보장한다. 일반 프로덕션(Tier 1~2) 사용자 또한 CDN의 편의성보다 안정성을 우선할 경우 이 방식을 자유롭게 선택할 수 있으며, 이 모든 결정은 사용자의 아키텍처 주권에 속한다.
 
 ---
 
@@ -240,11 +309,9 @@ UltronKit 아키텍처는 계층(Layer)의 개수가 변하더라도, 아래 4�
 2.  **Strict Hierarchy:** 분류 상위(4)는 하위(1)를 자유롭게 쓰지만, 하위는 상위를 절대 알 수 없다.
 3.  **Orthogonality:** 코드의 **논리적 계층(Taxonomy)**과 **물리적 실행 환경(Thread)**은 독립된 축이다.
 4.  **Fail-Safe Survival:** 상위 계층(UI/App)이 붕괴되어도 하위 계층(Data/Logic)은 생존하여 동작한다.
-5.  **Native Expansion:** 본 아키텍처는 **C/C++, Go, Kotlin, Python** 구현을 전제로 설계되었으며, 언어가 바뀌어도 구조는 불변이다. (**Rust는 영구히 배제한다.**)
-6.  **Data Vitality Model**: 모든 모듈은 처리 데이터를 **Command(인과 의무)**와 **State(휘발 현행)**로 물리적으로 분리하여 관리해야 하며, 이는 1.7의 생존 주기를 따른다.
-7.  **Static Memory Solidarity**: 모든 데이터 폼은 부팅 시 확정된 정적 슬롯(Static Slots)에만 상주하며, 런타임 신규 할당은 명세에 대한 '배신'으로 보아 금지한다. (MCC 준수)
-
-**※ 명칭의 유연성:** 위 명칭은 분류를 위한 일반 명사이며, 구현 시 계층의 위계와 본질을 더 잘 표현하는 이름이 있다면 이를 우선하여 사용한다. 명세의 이름보다 실제 역할에 대한 직관성과 적합성이 더 중요하다.
+5.  **Native Expansion:** 다중 언어 생태계에 대한 정의는 **Post-Web Continuity Strategy**를 참조한다. 각 언어는 포팅이 아닌 독자적 역할을 가진다.
+6.  **Data Vitality Model**: 모든 모듈은 처리 데이터를 **Command(인과 의무)**와 **State(휘발 현행)**로 물리적으로 분리하여 관리해야 하며, 이는 **Boundary of Control**의 생존 주기를 따른다.
+7.  **Static Memory Solidarity**: 메모리 정책의 상세 정의는 **Boundary of Control**을 참조한다.
 
 ---
 
@@ -467,6 +534,28 @@ window.UltronKit = { Identity, State, Logic, Design, Ops, Policy, Grid };
 
 > [!WARNING]
 > 아래 내용은 섹션 1 완결 후 해당 섹션으로 이동됩니다.
+
+### [PENDING] Audit & Style Rules (검사 및 스타일 규칙)
+
+> [!NOTE]
+> 아래 규칙들은 검증 시스템(Verify) 섹션 확정 시 해당 섹션으로 이동됩니다.
+
+#### Tier-based Audit Barrier
+
+- **Tier 1:** 30줄/80자/CX:10 (일반 프로덕션)
+- **Tier 2:** 20줄/75자/CX:5 (강화)
+- **Tier 3:** 10줄/70자/CX:2 (미션 크리티컬)
+
+#### Conceptual Separation (포맷 규칙)
+
+- 변수/제어문/반환 블록 간 정확히 1줄 빈 줄 필수
+- 중괄호 Zero Padding 엄수
+
+#### Comment Ban
+
+- 헤더 주석 외 모든 주석(내부 설명, 좀비 코드 등)은 즉시 패닉 사유
+
+---
 
 ### [PENDING] Layer 상세 정의 (→ 섹션 2~8)
 
